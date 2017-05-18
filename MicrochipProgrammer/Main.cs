@@ -1,4 +1,17 @@
-﻿using System;
+﻿/*
+ * Microchip Programmer
+ * designed by: Ryan Cavallaro
+ * 
+ * 
+ * TODO:
+ * ----------------------
+ * 1.  Check ARCHIVE / subfolders for ECL in ECL textbox if that ecl# is not found in the top level software dir (for custom flash)
+ * 
+ * 
+ * 
+ */
+
+using System;
 using Microsoft.VisualBasic.FileIO;
 using System.Collections.Generic;
 using System.Drawing;
@@ -13,11 +26,21 @@ namespace MicrochipProgrammer
 {
     public partial class Main : Form
     {
-        public const string VAULT_PATH = @"\\pandora\vault\Released_Part_Information\240-xxxxx-xx_Software\240-9XXXX-XX\240-91XXX-XX\";
+        public const string VAULT_PATH = @"\\pandora\vault\Released_Part_Information\240-xxxxx-xx_Software\240-9XXXX-XX\240-91XXX-XX";
 
         public Main()
         {
             InitializeComponent();
+            txtSWPartOne.Enter += (o, e) =>
+            {
+                if (txtSWPartOne.Text != string.Empty)
+                    txtSWPartOne.SelectAll();
+            };
+            txtSWPartTwo.Enter += (o, e) =>
+            {
+                if (txtSWPartTwo.Text != string.Empty)
+                    txtSWPartTwo.SelectAll();
+            };
         }
 
         private void Main_Load(object sender, EventArgs e)
@@ -27,40 +50,76 @@ namespace MicrochipProgrammer
 
         private void cmdGetECL_Click(object sender, EventArgs e)
         {
-            Regex rgx = new Regex(@"/ECL-\w+$/g");
-
             var softwarePartOne = txtSWPartOne.Text;
-            var softwarePartNumber = string.Format("240-{0}-{1}", txtSWPartOne.Text, txtSWPartTwo.Text);
-
-            var dirList = Directory.GetDirectories(string.Format(@"{0}\240-{1}-XX\{2}", VAULT_PATH, softwarePartOne, softwarePartNumber));
-
-            //foreach (var dir in dirList)
-            //{
-            //    MessageBox.Show(dir);
-            //}
-
-            //var dirECL = dirList.Where(p => p.Contains("ECL")).ToString();
-            //var dirz = from dir in dirList
-            //                where dir.Contains("ECL")
-            //                select dir;
-            string dirECL = "";
-            //foreach (var d in dirz)
-            //{
-            //    dirECL = d;
-            //}
-            foreach (var dir in dirList)
+            var softwarePartTwo = txtSWPartTwo.Text;
+            var softwarePartNumber = string.Format("240-{0}-{1}", softwarePartOne, softwarePartTwo);
+            //string[] softwareDirs = { };
+            var softwareDir = "";
+            try
+            {                
+                softwareDir =
+                    (from sd in Directory.GetDirectories(string.Format(@"{0}\240-{1}-XX\", VAULT_PATH, softwarePartOne))
+                     where sd.Contains(softwarePartNumber)
+                     select sd)
+                    .FirstOrDefault();
+            }
+            catch (DirectoryNotFoundException)
             {
-                if (dir.Contains("ECL"))
-                    dirECL = dir;
+                MessageBox.Show(softwarePartNumber + " is an invalid software part number.");
+                return;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error finding software directory: " + ex.Message);
+                return;
             }
 
-            //MessageBox.Show(dirECL);
-            var tempECLStr = dirECL.Substring(dirECL.Length - 6);MessageBox.Show(tempECLStr);
-            int dash = tempECLStr.IndexOf("-");
+            //var softwareDir = 
+            //    (from sd in softwareDirs
+            //    where sd.Contains(softwarePartNumber)
+            //    select sd)
+            //    .FirstOrDefault();
+
+            var eclDir = "";
+            if (Directory.Exists(softwareDir))
+            {
+                eclDir =
+                    (from ed in Directory.GetDirectories(softwareDir)
+                    where ed.Contains("ECL")
+                    select ed)
+                    .FirstOrDefault(); 
+            }
+            else
+            {
+                MessageBox.Show(softwarePartNumber + " is an invalid software part number.");
+                return;
+            }
+
+            //Regex r = new Regex(softwarePartNumber);
+            //foreach (var dir in softwareDirs)
+            //{
+
+            //    Match m = r.Match(dir);
+            //    if (m.Value == softwarePartNumber)
+            //    {
+            //        softwareDir = dir;
+            //        MessageBox.Show(dir);
+            //        break;
+            //    }
+            //    else
+            //    {
+            //        MessageBox.Show("Invalid software");
+            //        return;
+            //    }
+            //}
+
+            //var dirList = Directory.GetDirectories(softwareDir, "ECL*");
+            //var tempECLStr = dirList[0].Substring(dirList[0].Length - 6);
+
+            var tempECLStr = eclDir.Substring(eclDir.Length - 6);
+            int dash = tempECLStr.IndexOf("-", StringComparison.CurrentCulture);
             var softwareECL = tempECLStr.Substring(dash + 1);
             txtECL.Text = softwareECL;
         }
-
-        
     }
 }
