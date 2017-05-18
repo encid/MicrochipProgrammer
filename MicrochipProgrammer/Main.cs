@@ -5,7 +5,8 @@
  * 
  * TODO:
  * ----------------------
- * 1.  Check ARCHIVE / subfolders for ECL in ECL textbox if that ecl# is not found in the top level software dir (for custom flash)
+ * 1.  Move 'Get ECL' into its own method
+ * 2.  Check ARCHIVE / subfolders for ECL in ECL textbox if that ecl# is not found in the top level software dir (for custom flash)
  * 
  * 
  * 
@@ -53,8 +54,8 @@ namespace MicrochipProgrammer
             var softwarePartOne = txtSWPartOne.Text;
             var softwarePartTwo = txtSWPartTwo.Text;
             var softwarePartNumber = string.Format("240-{0}-{1}", softwarePartOne, softwarePartTwo);
-            //string[] softwareDirs = { };
             var softwareDir = "";
+            var eclDir = "";
             try
             {                
                 softwareDir =
@@ -73,14 +74,7 @@ namespace MicrochipProgrammer
                 MessageBox.Show("Error finding software directory: " + ex.Message);
                 return;
             }
-
-            //var softwareDir = 
-            //    (from sd in softwareDirs
-            //    where sd.Contains(softwarePartNumber)
-            //    select sd)
-            //    .FirstOrDefault();
-
-            var eclDir = "";
+            
             if (Directory.Exists(softwareDir))
             {
                 eclDir =
@@ -94,27 +88,6 @@ namespace MicrochipProgrammer
                 MessageBox.Show(softwarePartNumber + " is an invalid software part number.");
                 return;
             }
-
-            //Regex r = new Regex(softwarePartNumber);
-            //foreach (var dir in softwareDirs)
-            //{
-
-            //    Match m = r.Match(dir);
-            //    if (m.Value == softwarePartNumber)
-            //    {
-            //        softwareDir = dir;
-            //        MessageBox.Show(dir);
-            //        break;
-            //    }
-            //    else
-            //    {
-            //        MessageBox.Show("Invalid software");
-            //        return;
-            //    }
-            //}
-
-            //var dirList = Directory.GetDirectories(softwareDir, "ECL*");
-            //var tempECLStr = dirList[0].Substring(dirList[0].Length - 6);
 
             var tempECLStr = eclDir.Substring(eclDir.Length - 6);
             int dash = tempECLStr.IndexOf("-", StringComparison.CurrentCulture);
