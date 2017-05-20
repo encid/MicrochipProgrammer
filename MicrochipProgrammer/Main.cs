@@ -36,26 +36,22 @@ namespace MicrochipProgrammer
 
         private void InitializeEventHandlers()
         {
-            txtSWPartOne.Enter += (o, e) =>
-            {
-                if (txtSWPartOne.Text != string.Empty)
-                    txtSWPartOne.SelectAll();
-            };
-            txtSWPartTwo.Enter += (o, e) =>
-            {
-                if (txtSWPartTwo.Text != string.Empty)
-                    txtSWPartTwo.SelectAll();
-            };
-
             foreach (TextBox textBox in this.Controls.OfType<TextBox>())
             {
+                textBox.Enter += (o, e) =>
+                {
+                    if (textBox.Text != string.Empty)
+                        textBox.SelectAll();
+                };
                 textBox.KeyDown += (o, e) =>
                 {
-                    if (e.KeyCode == Keys.Enter)
-                    {
-                        if (o == txtSWPartOne || o == txtSWPartTwo)
-                            cmdGetECL_Click(this, e);
-                    }
+                    if (e.KeyCode == Keys.Enter && (o == txtSWPartOne || o == txtSWPartTwo))
+                        cmdGetECL_Click(this, e);
+                };
+                textBox.TextChanged += (o, e) =>
+                {
+                    if (o == txtSWPartOne && txtSWPartOne.TextLength > 4)                    
+                        txtSWPartTwo.Focus();                      
                 };
             }
         }
@@ -71,56 +67,39 @@ namespace MicrochipProgrammer
             var softwarePartTwo = txtSWPartTwo.Text;
             var softwarePartNumber = string.Format("240-{0}-{1}", softwarePartOne, softwarePartTwo);
 
-            if (getECL(softwarePartNumber, softwarePartOne) != string.Empty)
-            {
+            if (getECL(softwarePartNumber, softwarePartOne) == string.Empty)
+                txtECL.Text = string.Empty;
+            else
                 txtECL.Text = getECL(softwarePartNumber, softwarePartOne);
-            }                               
         }
 
         private string getECL(string softwarePartNumber, string softwarePartOne)
         {
-            string softwareDir;            
+            int dash;
+            string tempECLStr;
+
             try
             {
-                softwareDir = (from sd in Directory.GetDirectories(string.Format(@"{0}\240-{1}-XX\", VAULT_PATH, softwarePartOne))
-                              where sd.Contains(softwarePartNumber)
-                              select sd)
-                              .FirstOrDefault();
-            }
-            catch (DirectoryNotFoundException ex)
-            {
-                MessageBox.Show(softwarePartNumber + " is an invalid software part number.");
-                return string.Empty;
+                var softwareDir = (from sd in Directory.GetDirectories(string.Format(@"{0}\240-{1}-XX\", VAULT_PATH, softwarePartOne))
+                                  where sd.Contains(softwarePartNumber)
+                                  select sd)
+                                  .FirstOrDefault();
+            
+                var eclDir = (from ed in Directory.GetDirectories(softwareDir)
+                             where ed.Contains("ECL")
+                             select ed)
+                             .FirstOrDefault();
+                
+                tempECLStr = eclDir.Substring(eclDir.Length - 6);
+                dash = tempECLStr.IndexOf("-", StringComparison.CurrentCulture);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error finding software directory: " + ex.Message);
-                return string.Empty;
-            }
-
-            // Make sure the dir exists before attempting to get ECL subdirs
-            if (!Directory.Exists(softwareDir))
-            {
                 MessageBox.Show(softwarePartNumber + " is an invalid software part number.");
                 return string.Empty;
             }
-            
-            var eclDir = (from ed in Directory.GetDirectories(softwareDir)
-                     where ed.Contains("ECL")
-                     select ed)
-                     .FirstOrDefault();
 
-            // Make sure software dir has valid ECL subdirs
-            if (eclDir == null || !eclDir.Contains("ECL"))
-            {
-                MessageBox.Show(softwarePartNumber + " has no valid ECLs available.");
-                return string.Empty;
-            }
-
-            var tempECLStr = eclDir.Substring(eclDir.Length - 6);
-            int dash = tempECLStr.IndexOf("-", StringComparison.CurrentCulture);
             return tempECLStr.Substring(dash + 1);
         }
-
     }
 }
