@@ -39,26 +39,29 @@
             // 
             // txtSWPartOne
             // 
-            this.txtSWPartOne.Location = new System.Drawing.Point(48, 49);
+            this.txtSWPartOne.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtSWPartOne.Location = new System.Drawing.Point(64, 49);
             this.txtSWPartOne.MaxLength = 5;
             this.txtSWPartOne.Name = "txtSWPartOne";
-            this.txtSWPartOne.Size = new System.Drawing.Size(77, 20);
+            this.txtSWPartOne.Size = new System.Drawing.Size(77, 26);
             this.txtSWPartOne.TabIndex = 0;
             // 
             // txtSWPartTwo
             // 
-            this.txtSWPartTwo.Location = new System.Drawing.Point(147, 50);
+            this.txtSWPartTwo.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtSWPartTwo.Location = new System.Drawing.Point(166, 50);
             this.txtSWPartTwo.MaxLength = 2;
             this.txtSWPartTwo.Name = "txtSWPartTwo";
-            this.txtSWPartTwo.Size = new System.Drawing.Size(42, 20);
+            this.txtSWPartTwo.Size = new System.Drawing.Size(42, 26);
             this.txtSWPartTwo.TabIndex = 1;
             // 
             // txtECL
             // 
-            this.txtECL.Location = new System.Drawing.Point(247, 50);
+            this.txtECL.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtECL.Location = new System.Drawing.Point(263, 50);
             this.txtECL.MaxLength = 2;
             this.txtECL.Name = "txtECL";
-            this.txtECL.Size = new System.Drawing.Size(38, 20);
+            this.txtECL.Size = new System.Drawing.Size(38, 26);
             this.txtECL.TabIndex = 2;
             // 
             // cmdGetECL
@@ -74,27 +77,30 @@
             // lblSoftwarePrefix
             // 
             this.lblSoftwarePrefix.AutoSize = true;
+            this.lblSoftwarePrefix.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblSoftwarePrefix.Location = new System.Drawing.Point(14, 52);
             this.lblSoftwarePrefix.Name = "lblSoftwarePrefix";
-            this.lblSoftwarePrefix.Size = new System.Drawing.Size(28, 13);
+            this.lblSoftwarePrefix.Size = new System.Drawing.Size(45, 20);
             this.lblSoftwarePrefix.TabIndex = 4;
             this.lblSoftwarePrefix.Text = "240-";
             // 
             // lblDash
             // 
             this.lblDash.AutoSize = true;
-            this.lblDash.Location = new System.Drawing.Point(131, 52);
+            this.lblDash.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblDash.Location = new System.Drawing.Point(147, 53);
             this.lblDash.Name = "lblDash";
-            this.lblDash.Size = new System.Drawing.Size(10, 13);
+            this.lblDash.Size = new System.Drawing.Size(15, 20);
             this.lblDash.TabIndex = 5;
             this.lblDash.Text = "-";
             // 
             // lblECL
             // 
             this.lblECL.AutoSize = true;
+            this.lblECL.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblECL.Location = new System.Drawing.Point(214, 52);
             this.lblECL.Name = "lblECL";
-            this.lblECL.Size = new System.Drawing.Size(27, 13);
+            this.lblECL.Size = new System.Drawing.Size(43, 20);
             this.lblECL.TabIndex = 6;
             this.lblECL.Text = "ECL";
             // 

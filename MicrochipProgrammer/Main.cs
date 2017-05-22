@@ -62,10 +62,16 @@ namespace MicrochipProgrammer
         }
 
         private void cmdGetECL_Click(object sender, EventArgs e)
-        {
+        {                      
             var softwarePartOne = txtSWPartOne.Text;
             var softwarePartTwo = txtSWPartTwo.Text;
             var softwarePartNumber = string.Format("240-{0}-{1}", softwarePartOne, softwarePartTwo);
+
+            if (softwarePartOne.Length < 5 || softwarePartTwo.Length < 2)
+            {
+                MessageBox.Show(softwarePartNumber + " is an invalid software part number.");
+                return;
+            }
 
             if (getECL(softwarePartNumber, softwarePartOne) == string.Empty)
                 txtECL.Text = string.Empty;
