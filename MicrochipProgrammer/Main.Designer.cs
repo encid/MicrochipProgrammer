@@ -35,10 +35,13 @@
             this.lblSoftwarePrefix = new System.Windows.Forms.Label();
             this.lblDash = new System.Windows.Forms.Label();
             this.lblECL = new System.Windows.Forms.Label();
+            this.cmdProgram = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // txtSWPartOne
             // 
+            this.txtSWPartOne.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.txtSWPartOne.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.HistoryList;
             this.txtSWPartOne.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtSWPartOne.Location = new System.Drawing.Point(64, 49);
             this.txtSWPartOne.MaxLength = 5;
@@ -57,6 +60,7 @@
             // 
             // txtECL
             // 
+            this.txtECL.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
             this.txtECL.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtECL.Location = new System.Drawing.Point(263, 50);
             this.txtECL.MaxLength = 2;
@@ -104,11 +108,22 @@
             this.lblECL.TabIndex = 6;
             this.lblECL.Text = "ECL";
             // 
+            // cmdProgram
+            // 
+            this.cmdProgram.Location = new System.Drawing.Point(141, 130);
+            this.cmdProgram.Name = "cmdProgram";
+            this.cmdProgram.Size = new System.Drawing.Size(75, 23);
+            this.cmdProgram.TabIndex = 7;
+            this.cmdProgram.Text = "Program";
+            this.cmdProgram.UseVisualStyleBackColor = true;
+            this.cmdProgram.Click += new System.EventHandler(this.cmdProgram_Click);
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(457, 196);
+            this.ClientSize = new System.Drawing.Size(422, 211);
+            this.Controls.Add(this.cmdProgram);
             this.Controls.Add(this.lblECL);
             this.Controls.Add(this.lblDash);
             this.Controls.Add(this.lblSoftwarePrefix);
@@ -117,8 +132,8 @@
             this.Controls.Add(this.txtSWPartTwo);
             this.Controls.Add(this.txtSWPartOne);
             this.Name = "Main";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Form1";
-            this.Load += new System.EventHandler(this.Main_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -133,6 +148,7 @@
         private System.Windows.Forms.Label lblSoftwarePrefix;
         private System.Windows.Forms.Label lblDash;
         private System.Windows.Forms.Label lblECL;
+        private System.Windows.Forms.Button cmdProgram;
     }
 }
 

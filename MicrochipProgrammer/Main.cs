@@ -5,7 +5,7 @@
  * 
  * TODO:
  * ----------------------
- * 1.  Check ARCHIVE / subfolders for ECL in ECL textbox if that ecl# is not found in the top level software dir (for custom flash)
+ * 
  * 
  * 
  * 
@@ -36,29 +36,28 @@ namespace MicrochipProgrammer
 
         private void InitializeEventHandlers()
         {
+            // Handle textbox events
             foreach (TextBox textBox in this.Controls.OfType<TextBox>())
             {
+                // Select all text upon entering a textbox
                 textBox.Enter += (o, e) =>
                 {
                     if (textBox.Text != string.Empty)
                         textBox.SelectAll();
                 };
+                // Call GetLatestECL method upon enter being pressed in textbox
                 textBox.KeyDown += (o, e) =>
                 {
                     if (e.KeyCode == Keys.Enter && (o == txtSWPartOne || o == txtSWPartTwo))
-                        cmdGetECL_Click(this, e);
+                        cmdGetECL_Click(this, e);                    
                 };
+                // Move to next textbox automatically upon 5th char being entered in txtSWPartOne
                 textBox.TextChanged += (o, e) =>
                 {
                     if (o == txtSWPartOne && txtSWPartOne.TextLength > 4)                    
                         txtSWPartTwo.Focus();                      
                 };
             }
-        }
-
-        private void Main_Load(object sender, EventArgs e)
-        {
-
         }
 
         private void cmdGetECL_Click(object sender, EventArgs e)
@@ -73,31 +72,84 @@ namespace MicrochipProgrammer
                 return;
             }
 
-            if (getECL(softwarePartNumber, softwarePartOne) == string.Empty)
+            if (GetLatestECL(softwarePartNumber) == string.Empty)
                 txtECL.Text = string.Empty;
             else
-                txtECL.Text = getECL(softwarePartNumber, softwarePartOne);
+                txtECL.Text = GetLatestECL(softwarePartNumber);
         }
 
-        private string getECL(string softwarePartNumber, string softwarePartOne)
+        private void cmdProgram_Click(object sender, EventArgs e)
         {
-            int dash;
+            var softwarePartOne = txtSWPartOne.Text;
+            var softwarePartTwo = txtSWPartTwo.Text;
+            var softwarePartNumber = string.Format("240-{0}-{1}", softwarePartOne, softwarePartTwo);
+
+            if (softwarePartOne.Length < 5 || softwarePartTwo.Length < 2)
+            {
+                MessageBox.Show(softwarePartNumber + " is an invalid software part number.");
+                return;
+            }
+
+            var dirs = getSoftwareDirectories(softwarePartNumber);
+            var ECL = txtECL.Text;
+
+            if (dirs == null)
+            {
+                MessageBox.Show(softwarePartNumber + " is an invalid software part number.");
+                return;
+            }
+            if (ECL == "")
+            {
+                MessageBox.Show("Enter a valid ECL, or click 'Get ECL' button.");
+                return;
+            }            
+            
+            var softwareDir = (from sd in dirs
+                               where sd.Contains("ECL-" + ECL)
+                               select sd)
+                               .FirstOrDefault();
+
+            if (string.IsNullOrEmpty(softwareDir))
+            {
+                MessageBox.Show("Enter a valid ECL, or click 'Get ECL' button.");
+                return;
+            }
+
+        }
+
+        private IEnumerable<string> getSoftwareDirectories(string softwarePartNumber)
+        {
+            var softwarePartOne = softwarePartNumber.Substring(4, 5);
+            var path = string.Format(@"{0}\240-{1}-XX\{2}", VAULT_PATH, softwarePartOne, softwarePartNumber);
+
+            if (!Directory.Exists(path))
+                return null;
+                        
+            var dirs = Directory.EnumerateDirectories(path, "*", System.IO.SearchOption.AllDirectories).ToList();
+
+            return dirs.Where(d => d.Contains("ECL"));
+        }
+
+        private string GetLatestECL(string softwarePartNumber)
+        {
+            var softwarePartOne = softwarePartNumber.Substring(4, 5);
+            int dashIndex;
             string tempECLStr;
 
             try
             {
                 var softwareDir = (from sd in Directory.GetDirectories(string.Format(@"{0}\240-{1}-XX\", VAULT_PATH, softwarePartOne))
-                                  where sd.Contains(softwarePartNumber)
-                                  select sd)
-                                  .FirstOrDefault();
+                                   where sd.Contains(softwarePartNumber)
+                                   select sd)
+                                   .FirstOrDefault();
             
                 var eclDir = (from ed in Directory.GetDirectories(softwareDir)
-                             where ed.Contains("ECL")
-                             select ed)
-                             .FirstOrDefault();
+                              where ed.Contains("ECL")
+                              select ed)
+                              .FirstOrDefault();
                 
                 tempECLStr = eclDir.Substring(eclDir.Length - 6);
-                dash = tempECLStr.IndexOf("-", StringComparison.CurrentCulture);
+                dashIndex = tempECLStr.IndexOf("-", StringComparison.CurrentCulture);
             }
             catch (Exception ex)
             {
@@ -105,7 +157,8 @@ namespace MicrochipProgrammer
                 return string.Empty;
             }
 
-            return tempECLStr.Substring(dash + 1);
+            return tempECLStr.Substring(dashIndex + 1);
         }
+
     }
 }
