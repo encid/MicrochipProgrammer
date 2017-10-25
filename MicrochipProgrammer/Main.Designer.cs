@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Main));
             this.txtSWPartOne = new System.Windows.Forms.TextBox();
             this.txtSWPartTwo = new System.Windows.Forms.TextBox();
             this.txtECL = new System.Windows.Forms.TextBox();
@@ -41,11 +42,12 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.rbPIC16F716 = new System.Windows.Forms.RadioButton();
             this.rbPIC32MX440F128H = new System.Windows.Forms.RadioButton();
             this.rbPIC16F1718 = new System.Windows.Forms.RadioButton();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.rt = new System.Windows.Forms.RichTextBox();
-            this.rbPIC16F716 = new System.Windows.Forms.RadioButton();
+            this.label3 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -164,7 +166,7 @@
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Segoe UI", 20.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.ForeColor = System.Drawing.Color.Red;
-            this.label1.Location = new System.Drawing.Point(116, 5);
+            this.label1.Location = new System.Drawing.Point(105, 5);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(108, 37);
             this.label1.TabIndex = 7;
@@ -174,7 +176,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Segoe UI Semibold", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(216, 9);
+            this.label2.Location = new System.Drawing.Point(205, 9);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(309, 32);
             this.label2.TabIndex = 10;
@@ -191,6 +193,17 @@
             this.groupBox2.TabIndex = 11;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Processor";
+            // 
+            // rbPIC16F716
+            // 
+            this.rbPIC16F716.AutoSize = true;
+            this.rbPIC16F716.Location = new System.Drawing.Point(17, 69);
+            this.rbPIC16F716.Name = "rbPIC16F716";
+            this.rbPIC16F716.Size = new System.Drawing.Size(78, 17);
+            this.rbPIC16F716.TabIndex = 2;
+            this.rbPIC16F716.TabStop = true;
+            this.rbPIC16F716.Text = "PIC16F716";
+            this.rbPIC16F716.UseVisualStyleBackColor = true;
             // 
             // rbPIC32MX440F128H
             // 
@@ -235,16 +248,14 @@
             this.rt.TabStop = false;
             this.rt.Text = "";
             // 
-            // rbPIC16F716
+            // label3
             // 
-            this.rbPIC16F716.AutoSize = true;
-            this.rbPIC16F716.Location = new System.Drawing.Point(17, 69);
-            this.rbPIC16F716.Name = "rbPIC16F716";
-            this.rbPIC16F716.Size = new System.Drawing.Size(78, 17);
-            this.rbPIC16F716.TabIndex = 2;
-            this.rbPIC16F716.TabStop = true;
-            this.rbPIC16F716.Text = "PIC16F716";
-            this.rbPIC16F716.UseVisualStyleBackColor = true;
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(531, 25);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(80, 13);
+            this.label3.TabIndex = 13;
+            this.label3.Text = "v1.0, 10/25/17";
             // 
             // Main
             // 
@@ -252,6 +263,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(629, 354);
+            this.Controls.Add(this.label3);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.label2);
@@ -260,6 +272,7 @@
             this.Controls.Add(this.chkPowerTargetFromDevice);
             this.Controls.Add(this.cmdProgram);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "Main";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
@@ -296,6 +309,7 @@
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.RichTextBox rt;
         private System.Windows.Forms.RadioButton rbPIC16F716;
+        private System.Windows.Forms.Label label3;
     }
 }
 

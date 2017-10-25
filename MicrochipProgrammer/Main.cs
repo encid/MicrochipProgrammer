@@ -1,7 +1,7 @@
 ﻿/*
  * Microchip Programmer
  * designed by: Ryan Cavallaro
- * 
+ * NOTE:  Include PICKit3 directory with .exe.  Point to directory path in config file.
  * 
  * TODO:
  * ----------------------
@@ -181,17 +181,20 @@ namespace MicrochipProgrammer
                     voltage = 5.0;
             }
 
-            Logger.Log($"\nStarting to program {softwarePartNumber} ECL-{ECL}", rt);
+            Logger.Log($"\nStarting to program {softwarePartNumber} ECL-{ECL}...", rt);
 
-            switch (doProgram(softwareFile, processor, voltage))
-            {
-                case 0:
-                Logger.Log("\nProgramming successful.", rt, System.Drawing.Color.Green);
-                break;                
-                default:
-                Logger.Log("\nFailed to program device.", rt, System.Drawing.Color.Red);
-                break;
-            }
+            //switch (doProgram(softwareFile, processor, voltage))
+            //{
+            //    case 0:
+            //    Logger.Log("\nProgramming successful.", rt, System.Drawing.Color.Green);
+            //    break;                
+            //    default:
+            //    Logger.Log("\nFailed to program device.", rt, System.Drawing.Color.Red);
+            //    break;
+            //}
+            disableUI();
+            doProgram(softwareFile, processor, voltage);
+            enableUI();
         }
 
         private int doProgram(string file, string processor, double voltage)
@@ -221,40 +224,65 @@ namespace MicrochipProgrammer
                 using (Process exeProcess = Process.Start(startInfo))
                 {
                     exeProcess.WaitForExit();
-                    //switch (exeProcess.ExitCode)
-                    //{
-                    //    case 0:
-                    //    MessageBox.Show("Device programmed successfully. Code " + exeProcess.ExitCode, "Success");
-                    //    break;
-                    //    case 1:
-                    //    MessageBox.Show("Failure: HEX File not found (or invalid).", "Failure");
-                    //    break;
-                    //    case 2:
-                    //    MessageBox.Show("Failure: Communication with PICKIT3 lost.", "Failure");
-                    //    break;
-                    //    case 5:
-                    //    MessageBox.Show("Failure: PICKIT3 not detected or\r\nincorrect device connected.", "Failure");
-                    //    break;
-                    //    case 9:
-                    //    MessageBox.Show("Failure: PICKIT3 not detected or\r\nincorrect device connected.", "Failure");
-                    //    break;
-                    //    case 36:
-                    //    MessageBox.Show("Failure: HEX File not found (or invalid).", "Failure");
-                    //    break;
-                    //    default:
-                    //    MessageBox.Show("Unknown failure. Exited with code " + exeProcess.ExitCode, "Failure");
-                    //    break;
-                    //}
+                    switch (exeProcess.ExitCode)
+                    {
+                        case 0:
+                        Logger.Log("Device programmed successfully!", rt, System.Drawing.Color.Green);
+                        break;
+                        case 1:
+                        Logger.Log("Failure: HEX File not found (or invalid).", rt, System.Drawing.Color.Red);
+                        break;
+                        case 2:
+                        Logger.Log("Failure: Communication with PICKIT3 lost.", rt, System.Drawing.Color.Red);
+                        break;
+                        case 5:
+                        Logger.Log("Failure: PICKIT3 not detected or incorrect device connected.", rt, System.Drawing.Color.Red);
+                        break;
+                        case 7:
+                        Logger.Log("Failure: Device is not powered; select 'Power target using programmer' or supply external power source.", rt, System.Drawing.Color.Red);
+                        break;
+                        case 9:
+                        Logger.Log("Failure: PICKIT3 not detected or incorrect device connected.", rt, System.Drawing.Color.Red);
+                        break;
+                        case 36:
+                        Logger.Log("Failure: HEX File not found (or invalid).", rt, System.Drawing.Color.Red);
+                        break;
+                        default:
+                        Logger.Log("Unknown failure. Exited with code " + exeProcess.ExitCode, rt, System.Drawing.Color.Red);
+                        break;
+                    }
                     return exeProcess.ExitCode;
                 }
             }
             catch (Exception ex)
             {
-                //MessageBox.Show("Failed to program device.\nError: " + ex.Message, "Failed");
+                Logger.Log("Failed to program device. Error: " + ex.Message, rt, System.Drawing.Color.Red);
                 return -1;
             }
         }
-        
+
+        private void disableUI()
+        {
+            txtSWPartOne.Enabled = false;
+            txtSWPartTwo.Enabled = false;
+            txtECL.Enabled = false;
+            cmdGetECL.Enabled = false;
+            cmdProgram.Enabled = false;
+            groupBox2.Enabled = false;
+            chkPowerTargetFromDevice.Enabled = false;
+        }
+
+        private void enableUI()
+        {
+            txtSWPartOne.Enabled = true;
+            txtSWPartTwo.Enabled = true;
+            txtECL.Enabled = true;
+            cmdGetECL.Enabled = true;
+            cmdProgram.Enabled = true;
+            groupBox2.Enabled = true;
+            chkPowerTargetFromDevice.Enabled = true;
+        }
+
         private IEnumerable<string> getSoftwareDirectories(string softwarePartNumber)
         {
             var softwarePartOne = softwarePartNumber.Substring(4, 5);
@@ -286,13 +314,11 @@ namespace MicrochipProgrammer
                               select ed)
                               .FirstOrDefault();
 
-
                 tempECLStr = eclDir.Substring(eclDir.Length - 6);
                 dashIndex = tempECLStr.IndexOf("-", StringComparison.CurrentCulture);
             }
             catch (Exception)
             {
-                //MessageBox.Show(softwarePartNumber + " is an invalid software part number.");
                 return string.Empty;
             }
 
