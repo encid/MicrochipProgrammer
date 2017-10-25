@@ -12,21 +12,20 @@
  */
 
 using System;
-using Microsoft.VisualBasic.FileIO;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using System.Configuration;
 using System.ComponentModel;
-using System.Text.RegularExpressions;
+using System.Diagnostics;
+using System.Configuration;
 
 namespace MicrochipProgrammer
 {
     public partial class Main : Form
-    {
-        public const string VAULT_PATH = @"\\pandora\vault\Released_Part_Information\240-xxxxx-xx_Software\240-9XXXX-XX\240-91XXX-XX";
+    {        
+        public string VAULT_PATH = ConfigurationManager.AppSettings["VAULT_PATH"];
+        public string PICKIT_PATH = ConfigurationManager.AppSettings["PICKIT_PATH"];
 
         public Main()
         {
@@ -37,7 +36,7 @@ namespace MicrochipProgrammer
         private void InitializeEventHandlers()
         {
             // Handle textbox events
-            foreach (TextBox textBox in this.Controls.OfType<TextBox>())
+            foreach (TextBox textBox in groupBox1.Controls.OfType<TextBox>())
             {
                 // Select all text upon entering a textbox
                 textBox.Enter += (o, e) =>
@@ -45,11 +44,11 @@ namespace MicrochipProgrammer
                     if (textBox.Text != string.Empty)
                         textBox.SelectAll();
                 };
-                // Call GetLatestECL method upon enter being pressed in textbox
+                // Call GetECL button click method upon enter being pressed in SW textbox
                 textBox.KeyDown += (o, e) =>
                 {
                     if (e.KeyCode == Keys.Enter && (o == txtSWPartOne || o == txtSWPartTwo))
-                        cmdGetECL_Click(this, e);                    
+                        cmdGetECL.PerformClick();
                 };
                 // Move to next textbox automatically upon 5th char being entered in txtSWPartOne
                 textBox.TextChanged += (o, e) =>
@@ -57,7 +56,21 @@ namespace MicrochipProgrammer
                     if (o == txtSWPartOne && txtSWPartOne.TextLength > 4)                    
                         txtSWPartTwo.Focus();                      
                 };
+                // Make sure textbox stays at the most recent line(bottom most)
+                rt.TextChanged += (o, e) =>
+                {
+                    if (rt.Visible)
+                        rt.ScrollToCaret();
+                };
             }
+        }
+
+        private void Main_Load(object sender, EventArgs e)
+        {
+            // Give focus to software p/n textbox upon program being opened
+            this.ActiveControl = txtSWPartOne;
+            rbPIC16F1718.Checked = true;
+            Logger.Log("Application started - ready to program.", rt);
         }
 
         private void cmdGetECL_Click(object sender, EventArgs e)
@@ -68,14 +81,26 @@ namespace MicrochipProgrammer
 
             if (softwarePartOne.Length < 5 || softwarePartTwo.Length < 2)
             {
-                MessageBox.Show(softwarePartNumber + " is an invalid software part number.");
+                Logger.Log($"\nError: {softwarePartNumber} is not a valid software part number.", rt);
+                txtSWPartOne.Focus();
+                txtSWPartOne.SelectAll();
                 return;
             }
 
-            if (GetLatestECL(softwarePartNumber) == string.Empty)
-                txtECL.Text = string.Empty;
-            else
-                txtECL.Text = GetLatestECL(softwarePartNumber);
+            try
+            {
+                if (GetLatestECL(softwarePartNumber) == string.Empty)
+                {
+                    Logger.Log($"\nError: {softwarePartNumber} is not a valid software part number.", rt);
+                    txtECL.Text = string.Empty;
+                }
+                else
+                    txtECL.Text = GetLatestECL(softwarePartNumber);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         private void cmdProgram_Click(object sender, EventArgs e)
@@ -84,9 +109,13 @@ namespace MicrochipProgrammer
             var softwarePartTwo = txtSWPartTwo.Text;
             var softwarePartNumber = string.Format("240-{0}-{1}", softwarePartOne, softwarePartTwo);
 
+            // Error checking
+
             if (softwarePartOne.Length < 5 || softwarePartTwo.Length < 2)
             {
-                MessageBox.Show(softwarePartNumber + " is an invalid software part number.");
+                Logger.Log($"\nError: {softwarePartNumber} is an invalid software part number.", rt);
+                txtSWPartOne.Focus();
+                txtSWPartOne.SelectAll();
                 return;
             }
 
@@ -95,12 +124,14 @@ namespace MicrochipProgrammer
 
             if (dirs == null)
             {
-                MessageBox.Show(softwarePartNumber + " is an invalid software part number.");
+                Logger.Log($"\nError: {softwarePartNumber} is an invalid software part number.", rt);
+                txtSWPartOne.Focus();
+                txtSWPartOne.SelectAll();
                 return;
             }
             if (ECL == "")
             {
-                MessageBox.Show("Enter a valid ECL, or click 'Get ECL' button.");
+                Logger.Log($"\nError: No ECL entered; please enter an ECL number.", rt);
                 return;
             }            
             
@@ -111,12 +142,119 @@ namespace MicrochipProgrammer
 
             if (string.IsNullOrEmpty(softwareDir))
             {
-                MessageBox.Show("Enter a valid ECL, or click 'Get ECL' button.");
+                Logger.Log($"\nError: Invalid ECL entered; please enter a valid ECL or click 'Get ECL'.", rt);
                 return;
             }
 
+            // Valid directory found, now get hex file name from directory
+
+            var files = Directory.GetFiles(softwareDir, "*.hex", System.IO.SearchOption.TopDirectoryOnly);
+            if (!files.Any())
+            {
+                Logger.Log($"\nError: {softwarePartNumber} ECL-{ECL} does not use PIC/Microchip; can not program with this utility.", rt);
+                txtSWPartOne.Focus();
+                txtSWPartOne.SelectAll();
+                return;
+            }
+            var softwareFile = files[0];
+
+            // Check what processor and whether to use programmer to supply voltage
+            string processor = "";
+            double voltage = 0;
+
+            if (rbPIC16F1718.Checked)
+            {
+                processor = "P16F1718";
+                if (chkPowerTargetFromDevice.Checked)
+                    voltage = 5.0;
+            }
+            if (rbPIC32MX440F128H.Checked)
+            {
+                processor = "P32MX440F128H";
+                if (chkPowerTargetFromDevice.Checked)
+                    voltage = 3.3;
+            }
+            if (rbPIC16F716.Checked)
+            {
+                processor = "P16F716";
+                if (chkPowerTargetFromDevice.Checked)
+                    voltage = 5.0;
+            }
+
+            Logger.Log($"\nStarting to program {softwarePartNumber} ECL-{ECL}", rt);
+
+            switch (doProgram(softwareFile, processor, voltage))
+            {
+                case 0:
+                Logger.Log("\nProgramming successful.", rt, System.Drawing.Color.Green);
+                break;                
+                default:
+                Logger.Log("\nFailed to program device.", rt, System.Drawing.Color.Red);
+                break;
+            }
         }
 
+        private int doProgram(string file, string processor, double voltage)
+        {
+            if (file == "")
+            {
+                MessageBox.Show("Error: No file selected.");
+                return -1;
+            }
+
+            ProcessStartInfo startInfo = new ProcessStartInfo();
+            startInfo.CreateNoWindow = false;
+            //startInfo.UseShellExecute = false;
+            startInfo.FileName = $@"{PICKIT_PATH}\PK3CMD.exe";
+            startInfo.WindowStyle = ProcessWindowStyle.Normal;
+            startInfo.Arguments = string.Format("/{0} /M /L /F\"{1}\"", processor, file);
+
+            if (voltage > 0)
+            {
+                startInfo.Arguments += string.Format($@" /V{voltage.ToString()}");
+            }
+
+            try
+            {
+                // Start the process with the info we specified.
+                // Call WaitForExit and then the using statement will close.
+                using (Process exeProcess = Process.Start(startInfo))
+                {
+                    exeProcess.WaitForExit();
+                    //switch (exeProcess.ExitCode)
+                    //{
+                    //    case 0:
+                    //    MessageBox.Show("Device programmed successfully. Code " + exeProcess.ExitCode, "Success");
+                    //    break;
+                    //    case 1:
+                    //    MessageBox.Show("Failure: HEX File not found (or invalid).", "Failure");
+                    //    break;
+                    //    case 2:
+                    //    MessageBox.Show("Failure: Communication with PICKIT3 lost.", "Failure");
+                    //    break;
+                    //    case 5:
+                    //    MessageBox.Show("Failure: PICKIT3 not detected or\r\nincorrect device connected.", "Failure");
+                    //    break;
+                    //    case 9:
+                    //    MessageBox.Show("Failure: PICKIT3 not detected or\r\nincorrect device connected.", "Failure");
+                    //    break;
+                    //    case 36:
+                    //    MessageBox.Show("Failure: HEX File not found (or invalid).", "Failure");
+                    //    break;
+                    //    default:
+                    //    MessageBox.Show("Unknown failure. Exited with code " + exeProcess.ExitCode, "Failure");
+                    //    break;
+                    //}
+                    return exeProcess.ExitCode;
+                }
+            }
+            catch (Exception ex)
+            {
+                //MessageBox.Show("Failed to program device.\nError: " + ex.Message, "Failed");
+                return -1;
+            }
+        }
+        
         private IEnumerable<string> getSoftwareDirectories(string softwarePartNumber)
         {
             var softwarePartOne = softwarePartNumber.Substring(4, 5);
@@ -142,23 +280,23 @@ namespace MicrochipProgrammer
                                    where sd.Contains(softwarePartNumber)
                                    select sd)
                                    .FirstOrDefault();
-            
+
                 var eclDir = (from ed in Directory.GetDirectories(softwareDir)
                               where ed.Contains("ECL")
                               select ed)
                               .FirstOrDefault();
-                
+
+
                 tempECLStr = eclDir.Substring(eclDir.Length - 6);
                 dashIndex = tempECLStr.IndexOf("-", StringComparison.CurrentCulture);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                MessageBox.Show(softwarePartNumber + " is an invalid software part number.");
+                //MessageBox.Show(softwarePartNumber + " is an invalid software part number.");
                 return string.Empty;
             }
 
             return tempECLStr.Substring(dashIndex + 1);
         }
-
     }
 }
