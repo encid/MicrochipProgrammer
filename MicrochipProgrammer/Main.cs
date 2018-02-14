@@ -108,6 +108,7 @@ namespace MicrochipProgrammer
             var softwarePartOne = txtSWPartOne.Text;
             var softwarePartTwo = txtSWPartTwo.Text;
             var softwarePartNumber = string.Format("240-{0}-{1}", softwarePartOne, softwarePartTwo);
+            pictureBox1.Image = MicrochipProgrammer.Properties.Resources.questionmark;
 
             // Error checking
 
@@ -228,27 +229,35 @@ namespace MicrochipProgrammer
                     {
                         case 0:
                         Logger.Log("Device programmed successfully!", rt, System.Drawing.Color.Green);
+                        pictureBox1.Image = MicrochipProgrammer.Properties.Resources.check;
                         break;
                         case 1:
                         Logger.Log("Failure: HEX File not found (or invalid).", rt, System.Drawing.Color.Red);
+                        pictureBox1.Image = MicrochipProgrammer.Properties.Resources.red_x;
                         break;
                         case 2:
                         Logger.Log("Failure: Communication with PICKIT3 lost.", rt, System.Drawing.Color.Red);
+                        pictureBox1.Image = MicrochipProgrammer.Properties.Resources.red_x;
                         break;
                         case 5:
                         Logger.Log("Failure: PICKIT3 not detected or incorrect device connected.", rt, System.Drawing.Color.Red);
+                        pictureBox1.Image = MicrochipProgrammer.Properties.Resources.red_x;
                         break;
                         case 7:
                         Logger.Log("Failure: Device is not powered; select 'Power target using programmer' or supply external power source.", rt, System.Drawing.Color.Red);
+                        pictureBox1.Image = MicrochipProgrammer.Properties.Resources.red_x;
                         break;
                         case 9:
                         Logger.Log("Failure: PICKIT3 not detected or incorrect device connected.", rt, System.Drawing.Color.Red);
+                        pictureBox1.Image = MicrochipProgrammer.Properties.Resources.red_x;
                         break;
                         case 36:
                         Logger.Log("Failure: HEX File not found (or invalid).", rt, System.Drawing.Color.Red);
+                        pictureBox1.Image = MicrochipProgrammer.Properties.Resources.red_x;
                         break;
                         default:
                         Logger.Log("Unknown failure. Exited with code " + exeProcess.ExitCode, rt, System.Drawing.Color.Red);
+                        pictureBox1.Image = MicrochipProgrammer.Properties.Resources.red_x;
                         break;
                     }
                     return exeProcess.ExitCode;
@@ -257,6 +266,7 @@ namespace MicrochipProgrammer
             catch (Exception ex)
             {
                 Logger.Log("Failed to program device. Error: " + ex.Message, rt, System.Drawing.Color.Red);
+                pictureBox1.Image = MicrochipProgrammer.Properties.Resources.red_x;
                 return -1;
             }
         }

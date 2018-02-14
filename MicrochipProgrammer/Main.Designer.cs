@@ -48,9 +48,11 @@
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.rt = new System.Windows.Forms.RichTextBox();
             this.label3 = new System.Windows.Forms.Label();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // txtSWPartOne
@@ -127,9 +129,9 @@
             // cmdProgram
             // 
             this.cmdProgram.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.cmdProgram.Location = new System.Drawing.Point(479, 294);
+            this.cmdProgram.Location = new System.Drawing.Point(463, 294);
             this.cmdProgram.Name = "cmdProgram";
-            this.cmdProgram.Size = new System.Drawing.Size(104, 48);
+            this.cmdProgram.Size = new System.Drawing.Size(127, 48);
             this.cmdProgram.TabIndex = 8;
             this.cmdProgram.Text = "Program";
             this.cmdProgram.UseVisualStyleBackColor = true;
@@ -255,7 +257,20 @@
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(74, 13);
             this.label3.TabIndex = 13;
-            this.label3.Text = "v1.1, 2/14/18";
+            this.label3.Text = "v1.2, 2/14/18";
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.pictureBox1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.pictureBox1.Image = global::MicrochipProgrammer.Properties.Resources.questionmark;
+            this.pictureBox1.InitialImage = global::MicrochipProgrammer.Properties.Resources.questionmark;
+            this.pictureBox1.Location = new System.Drawing.Point(479, 199);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(100, 89);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox1.TabIndex = 14;
+            this.pictureBox1.TabStop = false;
             // 
             // Main
             // 
@@ -263,6 +278,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(629, 354);
+            this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
@@ -284,6 +300,7 @@
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.groupBox3.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -310,6 +327,7 @@
         private System.Windows.Forms.RichTextBox rt;
         private System.Windows.Forms.RadioButton rbPIC16F716;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.PictureBox pictureBox1;
     }
 }
 
