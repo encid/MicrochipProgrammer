@@ -302,9 +302,12 @@ namespace MicrochipProgrammer
             int dashIndex;
             string tempECLStr;
 
+            //set software vault path to appropriate number depending on what the software pn starts with
+            string softwarePrePath = string.Format(@"240-{0}XXXX-XX\240-{1}XXX-XX", softwarePartOne[0], softwarePartOne.Substring(0,2));
+
             try
             {
-                var softwareDir = (from sd in Directory.GetDirectories(string.Format(@"{0}\240-{1}-XX\", VAULT_PATH, softwarePartOne))
+                var softwareDir = (from sd in Directory.GetDirectories(string.Format(@"{1}\{0}\240-{2}-XX\", softwarePrePath, VAULT_PATH, softwarePartOne))
                                    where sd.Contains(softwarePartNumber)
                                    select sd)
                                    .FirstOrDefault();
