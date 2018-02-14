@@ -286,7 +286,11 @@ namespace MicrochipProgrammer
         private IEnumerable<string> getSoftwareDirectories(string softwarePartNumber)
         {
             var softwarePartOne = softwarePartNumber.Substring(4, 5);
-            var path = string.Format(@"{0}\240-{1}-XX\{2}", VAULT_PATH, softwarePartOne, softwarePartNumber);
+
+            //set software vault path to appropriate number depending on what the software pn starts with
+            string softwarePrePath = string.Format(@"240-{0}XXXX-XX\240-{1}XXX-XX", softwarePartOne[0], softwarePartOne.Substring(0, 2));
+
+            var path = string.Format(@"{1}\{0}\240-{2}-XX\{3}", softwarePrePath, VAULT_PATH, softwarePartOne, softwarePartNumber);
 
             if (!Directory.Exists(path))
                 return null;
