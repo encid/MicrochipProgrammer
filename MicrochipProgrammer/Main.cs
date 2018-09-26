@@ -16,7 +16,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Configuration;
 
@@ -63,6 +62,19 @@ namespace MicrochipProgrammer
                         rt.ScrollToCaret();
                 };
             }
+
+            ToolTip toolTip = new ToolTip();
+
+            // Set up the delays for the ToolTip.
+            toolTip.InitialDelay = 500;
+            toolTip.ReshowDelay = 500;
+            // Force the ToolTip text to be displayed whether or not the form is active.
+            toolTip.ShowAlways = true;
+
+            // Set up the ToolTip text for the Button and Checkbox.
+            toolTip.SetToolTip(rbPIC16F1718, "Grindmaster");
+            toolTip.SetToolTip(rbPIC32MX440F128H, "Fast Transfer");
+            toolTip.SetToolTip(rbPIC16F716, "Modularm");            
         }
 
         private void Main_Load(object sender, EventArgs e)
@@ -71,13 +83,19 @@ namespace MicrochipProgrammer
             this.ActiveControl = txtSWPartOne;
             rbPIC16F1718.Checked = true;
             Logger.Log("Application started - ready to program.", rt);
+
+            // Make sure config file points to PK3CMD exe
+            if (!File.Exists(PICKIT_PATH + "pk3cmd.exe"))
+            {
+                MessageBox.Show($"Warning: PK3CMD.exe not found at {PICKIT_PATH}.\nCheck the configuration file before proceeding.", "PIC/Microchip Programmer", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         }
 
         private void cmdGetECL_Click(object sender, EventArgs e)
         {                      
             var softwarePartOne = txtSWPartOne.Text;
             var softwarePartTwo = txtSWPartTwo.Text;
-            var softwarePartNumber = string.Format("240-{0}-{1}", softwarePartOne, softwarePartTwo);
+            var softwarePartNumber = $"240-{softwarePartOne}-{softwarePartTwo}";
 
             if (softwarePartOne.Length < 5 || softwarePartTwo.Length < 2)
             {
@@ -107,8 +125,8 @@ namespace MicrochipProgrammer
         {
             var softwarePartOne = txtSWPartOne.Text;
             var softwarePartTwo = txtSWPartTwo.Text;
-            var softwarePartNumber = string.Format("240-{0}-{1}", softwarePartOne, softwarePartTwo);
-            pictureBox1.Image = MicrochipProgrammer.Properties.Resources.questionmark;
+            var softwarePartNumber = $"240-{softwarePartOne}-{softwarePartTwo}";
+            pictureBox1.Image = Properties.Resources.questionmark;
 
             // Error checking
 
@@ -134,12 +152,9 @@ namespace MicrochipProgrammer
             {
                 Logger.Log($"\nError: No ECL entered; please enter an ECL number.", rt);
                 return;
-            }            
-            
-            var softwareDir = (from sd in dirs
-                               where sd.Contains("ECL-" + ECL)
-                               select sd)
-                               .FirstOrDefault();
+            }
+
+            var softwareDir = dirs.FirstOrDefault(p => p.Contains($"ECL-{ECL}"));
 
             if (string.IsNullOrEmpty(softwareDir))
             {
@@ -149,7 +164,7 @@ namespace MicrochipProgrammer
 
             // Valid directory found, now get hex file name from directory
 
-            var files = Directory.GetFiles(softwareDir, "*.hex", System.IO.SearchOption.TopDirectoryOnly);
+            var files = Directory.GetFiles(softwareDir, "*.hex", SearchOption.TopDirectoryOnly);
             if (!files.Any())
             {
                 Logger.Log($"\nError: {softwarePartNumber} ECL-{ECL} does not use PIC/Microchip; can not program with this utility.", rt);
@@ -183,16 +198,7 @@ namespace MicrochipProgrammer
             }
 
             Logger.Log($"\nStarting to program {softwarePartNumber} ECL-{ECL}...", rt);
-
-            //switch (doProgram(softwareFile, processor, voltage))
-            //{
-            //    case 0:
-            //    Logger.Log("\nProgramming successful.", rt, System.Drawing.Color.Green);
-            //    break;                
-            //    default:
-            //    Logger.Log("\nFailed to program device.", rt, System.Drawing.Color.Red);
-            //    break;
-            //}
+            
             disableUI();
             doProgram(softwareFile, processor, voltage);
             enableUI();
@@ -208,14 +214,14 @@ namespace MicrochipProgrammer
 
             ProcessStartInfo startInfo = new ProcessStartInfo();
             startInfo.CreateNoWindow = false;
-            //startInfo.UseShellExecute = false;
+            startInfo.UseShellExecute = false;
             startInfo.FileName = $@"{PICKIT_PATH}\PK3CMD.exe";
             startInfo.WindowStyle = ProcessWindowStyle.Normal;
-            startInfo.Arguments = string.Format("/{0} /M /L /F\"{1}\"", processor, file);
+            startInfo.Arguments = $"/{processor} /M /L /F\"{file}\"";
 
             if (voltage > 0)
             {
-                startInfo.Arguments += string.Format($@" /V{voltage.ToString()}");
+                startInfo.Arguments += $@" /V{voltage.ToString()}";
             }
 
             try
@@ -298,14 +304,14 @@ namespace MicrochipProgrammer
             var softwarePartOne = softwarePartNumber.Substring(4, 5);
 
             //set software vault path to appropriate number depending on what the software pn starts with
-            string softwarePrePath = string.Format(@"240-{0}XXXX-XX\240-{1}XXX-XX", softwarePartOne[0], softwarePartOne.Substring(0, 2));
+            string softwarePrePath = $@"240-{softwarePartOne[0]}XXXX-XX\240-{softwarePartOne.Substring(0, 2)}XXX-XX";
 
-            var path = string.Format(@"{1}\{0}\240-{2}-XX\{3}", softwarePrePath, VAULT_PATH, softwarePartOne, softwarePartNumber);
+            var path = $@"{VAULT_PATH}\{softwarePrePath}\240-{softwarePartOne}-XX\{softwarePartNumber}";
 
             if (!Directory.Exists(path))
                 return null;
                         
-            var dirs = Directory.EnumerateDirectories(path, "*", System.IO.SearchOption.AllDirectories).ToList();
+            var dirs = Directory.EnumerateDirectories(path, "*", SearchOption.AllDirectories).ToList();
 
             return dirs.Where(d => d.Contains("ECL"));
         }
@@ -317,19 +323,14 @@ namespace MicrochipProgrammer
             string tempECLStr;
 
             //set software vault path to appropriate number depending on what the software pn starts with
-            string softwarePrePath = string.Format(@"240-{0}XXXX-XX\240-{1}XXX-XX", softwarePartOne[0], softwarePartOne.Substring(0,2));
+            string softwarePrePath = $@"240-{softwarePartOne[0]}XXXX-XX\240-{softwarePartOne.Substring(0, 2)}XXX-XX";
 
             try
             {
-                var softwareDir = (from sd in Directory.GetDirectories(string.Format(@"{1}\{0}\240-{2}-XX\", softwarePrePath, VAULT_PATH, softwarePartOne))
-                                   where sd.Contains(softwarePartNumber)
-                                   select sd)
-                                   .FirstOrDefault();
+                var softwareDir = Directory.GetDirectories($@"{VAULT_PATH}\{softwarePrePath}\240-{softwarePartOne}-XX\")
+                                           .FirstOrDefault(dir => dir.Contains(softwarePartNumber));
 
-                var eclDir = (from ed in Directory.GetDirectories(softwareDir)
-                              where ed.Contains("ECL")
-                              select ed)
-                              .FirstOrDefault();
+                var eclDir = Directory.GetDirectories(softwareDir).FirstOrDefault(dir => dir.Contains("ECL"));
 
                 tempECLStr = eclDir.Substring(eclDir.Length - 6);
                 dashIndex = tempECLStr.IndexOf("-", StringComparison.CurrentCulture);

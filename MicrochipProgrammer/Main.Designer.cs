@@ -140,7 +140,7 @@
             // chkPowerTargetFromDevice
             // 
             this.chkPowerTargetFromDevice.AutoSize = true;
-            this.chkPowerTargetFromDevice.Location = new System.Drawing.Point(446, 176);
+            this.chkPowerTargetFromDevice.Location = new System.Drawing.Point(445, 176);
             this.chkPowerTargetFromDevice.Name = "chkPowerTargetFromDevice";
             this.chkPowerTargetFromDevice.Size = new System.Drawing.Size(172, 17);
             this.chkPowerTargetFromDevice.TabIndex = 7;
@@ -180,21 +180,21 @@
             this.label2.Font = new System.Drawing.Font("Segoe UI Semibold", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label2.Location = new System.Drawing.Point(205, 9);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(309, 32);
+            this.label2.Size = new System.Drawing.Size(312, 32);
             this.label2.TabIndex = 10;
-            this.label2.Text = "PIC Microchip Programmer";
+            this.label2.Text = "PIC/Microchip Programmer";
             // 
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.rbPIC16F716);
             this.groupBox2.Controls.Add(this.rbPIC32MX440F128H);
             this.groupBox2.Controls.Add(this.rbPIC16F1718);
-            this.groupBox2.Location = new System.Drawing.Point(446, 54);
+            this.groupBox2.Location = new System.Drawing.Point(432, 54);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(172, 116);
+            this.groupBox2.Size = new System.Drawing.Size(186, 116);
             this.groupBox2.TabIndex = 11;
             this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Processor";
+            this.groupBox2.Text = "Processor (mouse over for details)";
             // 
             // rbPIC16F716
             // 
@@ -204,6 +204,7 @@
             this.rbPIC16F716.Size = new System.Drawing.Size(78, 17);
             this.rbPIC16F716.TabIndex = 2;
             this.rbPIC16F716.TabStop = true;
+            this.rbPIC16F716.Tag = "PIC16F716";
             this.rbPIC16F716.Text = "PIC16F716";
             this.rbPIC16F716.UseVisualStyleBackColor = true;
             // 
@@ -215,6 +216,7 @@
             this.rbPIC32MX440F128H.Size = new System.Drawing.Size(120, 17);
             this.rbPIC32MX440F128H.TabIndex = 1;
             this.rbPIC32MX440F128H.TabStop = true;
+            this.rbPIC32MX440F128H.Tag = "PIC32MX440F128H";
             this.rbPIC32MX440F128H.Text = "PIC32MX440F128H";
             this.rbPIC32MX440F128H.UseVisualStyleBackColor = true;
             // 
@@ -223,10 +225,11 @@
             this.rbPIC16F1718.AutoSize = true;
             this.rbPIC16F1718.Location = new System.Drawing.Point(17, 22);
             this.rbPIC16F1718.Name = "rbPIC16F1718";
-            this.rbPIC16F1718.Size = new System.Drawing.Size(149, 17);
+            this.rbPIC16F1718.Size = new System.Drawing.Size(84, 17);
             this.rbPIC16F1718.TabIndex = 0;
             this.rbPIC16F1718.TabStop = true;
-            this.rbPIC16F1718.Text = "PIC16F1718 (Grindmaster)";
+            this.rbPIC16F1718.Tag = "PIC16F1718";
+            this.rbPIC16F1718.Text = "PIC16F1718";
             this.rbPIC16F1718.UseVisualStyleBackColor = true;
             // 
             // groupBox3
@@ -257,7 +260,7 @@
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(74, 13);
             this.label3.TabIndex = 13;
-            this.label3.Text = "v1.2, 2/14/18";
+            this.label3.Text = "v1.3, 9/26/18";
             // 
             // pictureBox1
             // 
@@ -293,7 +296,7 @@
             this.Name = "Main";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "PIC Microchip Programmer";
+            this.Text = "PIC/Microchip Programmer";
             this.Load += new System.EventHandler(this.Main_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
