@@ -74,7 +74,8 @@ namespace MicrochipProgrammer
             // Set up the ToolTip text for the Button and Checkbox.
             toolTip.SetToolTip(rbPIC16F1718, "Grindmaster");
             toolTip.SetToolTip(rbPIC32MX440F128H, "Fast Transfer");
-            toolTip.SetToolTip(rbPIC16F716, "Modularm");            
+            toolTip.SetToolTip(rbPIC16F716, "Modularm");
+            toolTip.SetToolTip(rbPIC12F1840, "80266 Reset Generator");
         }
 
         private void Main_Load(object sender, EventArgs e)
@@ -193,6 +194,12 @@ namespace MicrochipProgrammer
             if (rbPIC16F716.Checked)
             {
                 processor = "P16F716";
+                if (chkPowerTargetFromDevice.Checked)
+                    voltage = 5.0;
+            }
+            if (rbPIC12F1840.Checked)
+            {
+                processor = "P12F1840";
                 if (chkPowerTargetFromDevice.Checked)
                     voltage = 5.0;
             }

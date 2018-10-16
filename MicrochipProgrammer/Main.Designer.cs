@@ -49,6 +49,7 @@
             this.rt = new System.Windows.Forms.RichTextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.rbPIC12F1840 = new System.Windows.Forms.RadioButton();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -186,6 +187,7 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.rbPIC12F1840);
             this.groupBox2.Controls.Add(this.rbPIC16F716);
             this.groupBox2.Controls.Add(this.rbPIC32MX440F128H);
             this.groupBox2.Controls.Add(this.rbPIC16F1718);
@@ -258,9 +260,9 @@
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(531, 25);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(74, 13);
+            this.label3.Size = new System.Drawing.Size(80, 13);
             this.label3.TabIndex = 13;
-            this.label3.Text = "v1.3, 9/26/18";
+            this.label3.Text = "v1.4, 10/16/18";
             // 
             // pictureBox1
             // 
@@ -274,6 +276,17 @@
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox1.TabIndex = 14;
             this.pictureBox1.TabStop = false;
+            // 
+            // rbPIC12F1840
+            // 
+            this.rbPIC12F1840.AutoSize = true;
+            this.rbPIC12F1840.Location = new System.Drawing.Point(17, 92);
+            this.rbPIC12F1840.Name = "rbPIC12F1840";
+            this.rbPIC12F1840.Size = new System.Drawing.Size(84, 17);
+            this.rbPIC12F1840.TabIndex = 3;
+            this.rbPIC12F1840.TabStop = true;
+            this.rbPIC12F1840.Text = "PIC12F1840";
+            this.rbPIC12F1840.UseVisualStyleBackColor = true;
             // 
             // Main
             // 
@@ -331,6 +344,7 @@
         private System.Windows.Forms.RadioButton rbPIC16F716;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.RadioButton rbPIC12F1840;
     }
 }
 
