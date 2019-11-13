@@ -26,7 +26,7 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ProductName>PIC Microchip Programmer</ProductName>
     <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.4.0.%2a</ApplicationVersion>
+    <ApplicationVersion>1.5.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -54,6 +54,19 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="NationalInstruments.TestStand.Interop.API, Version=14.0.0.274, Culture=neutral, PublicKeyToken=ad9244eb3b825cd8">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="NationalInstruments.TestStand.Interop.UI, Version=14.0.0.274, Culture=neutral, PublicKeyToken=ad9244eb3b825cd8">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="NationalInstruments.TestStand.Interop.UI.AxControls, Version=14.0.0.274, Culture=neutral, PublicKeyToken=ad9244eb3b825cd8, processorArchitecture=MSIL" />
+    <Reference Include="NationalInstruments.TestStand.Interop.UI.Support, Version=14.0.0.274, Culture=neutral, PublicKeyToken=ad9244eb3b825cd8">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="stdole, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />

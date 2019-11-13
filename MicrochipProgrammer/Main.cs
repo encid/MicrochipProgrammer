@@ -12,6 +12,7 @@
  */
 
 using System;
+using System.ComponentModel;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -25,6 +26,7 @@ namespace MicrochipProgrammer
     {        
         public string VAULT_PATH = ConfigurationManager.AppSettings["VAULT_PATH"];
         public string PICKIT_PATH = ConfigurationManager.AppSettings["PICKIT_PATH"];
+        BackgroundWorker bw;
 
         public Main()
         {
@@ -61,15 +63,24 @@ namespace MicrochipProgrammer
                     if (rt.Visible)
                         rt.ScrollToCaret();
                 };
+
+                bw = new BackgroundWorker
+                {
+                    WorkerReportsProgress = true,
+                    WorkerSupportsCancellation = true
+                };
+                bw.DoWork += bw_DoWork;
+                bw.RunWorkerCompleted += bw_RunWorkerCompleted;
             }
 
-            ToolTip toolTip = new ToolTip();
-
-            // Set up the delays for the ToolTip.
-            toolTip.InitialDelay = 500;
-            toolTip.ReshowDelay = 500;
-            // Force the ToolTip text to be displayed whether or not the form is active.
-            toolTip.ShowAlways = true;
+            ToolTip toolTip = new ToolTip
+            {
+                // Set up the delays for the ToolTip.
+                InitialDelay = 200,
+                ReshowDelay = 200,
+                // Force the ToolTip text to be displayed whether or not the form is active.
+                ShowAlways = true
+            };
 
             // Set up the ToolTip text for the Button and Checkbox.
             toolTip.SetToolTip(rbPIC16F1718, "Grindmaster");
@@ -92,6 +103,12 @@ namespace MicrochipProgrammer
             }
         }
 
+        private void ExecuteSecure(Action a)
+        // Usage example: ExecuteSecure(() => this.someLabel.Text = "foo");
+        {
+            Invoke((MethodInvoker)delegate { a(); });
+        }
+
         private void cmdGetECL_Click(object sender, EventArgs e)
         {                      
             var softwarePartOne = txtSWPartOne.Text;
@@ -110,7 +127,7 @@ namespace MicrochipProgrammer
             {
                 if (GetLatestECL(softwarePartNumber) == string.Empty)
                 {
-                    Logger.Log($"\nError: {softwarePartNumber} is not a valid software part number.", rt);
+                    Logger.Log($"\nError: {softwarePartNumber} is not a valid software part number, or was not found in vault.", rt);
                     txtECL.Text = string.Empty;
                 }
                 else
@@ -124,6 +141,7 @@ namespace MicrochipProgrammer
 
         private void cmdProgram_Click(object sender, EventArgs e)
         {
+            
             var softwarePartOne = txtSWPartOne.Text;
             var softwarePartTwo = txtSWPartTwo.Text;
             var softwarePartNumber = $"240-{softwarePartOne}-{softwarePartTwo}";
@@ -139,7 +157,7 @@ namespace MicrochipProgrammer
                 return;
             }
 
-            var dirs = getSoftwareDirectories(softwarePartNumber);
+            var dirs = GetSoftwareDirectories(softwarePartNumber);
             var ECL = txtECL.Text;
 
             if (dirs == null)
@@ -177,41 +195,43 @@ namespace MicrochipProgrammer
 
             // Check what processor and whether to use programmer to supply voltage
             string processor = "";
-            double voltage = 0;
+            string voltage = "";
 
             if (rbPIC16F1718.Checked)
             {
                 processor = "P16F1718";
                 if (chkPowerTargetFromDevice.Checked)
-                    voltage = 5.0;
+                    voltage = "5.0";
             }
             if (rbPIC32MX440F128H.Checked)
             {
                 processor = "P32MX440F128H";
                 if (chkPowerTargetFromDevice.Checked)
-                    voltage = 3.3;
+                    voltage = "3.3";
             }
             if (rbPIC16F716.Checked)
             {
                 processor = "P16F716";
                 if (chkPowerTargetFromDevice.Checked)
-                    voltage = 5.0;
+                    voltage = "5.0";
             }
             if (rbPIC12F1840.Checked)
             {
                 processor = "P12F1840";
                 if (chkPowerTargetFromDevice.Checked)
-                    voltage = 5.0;
+                    voltage = "5.0";
             }
-
-            Logger.Log($"\nStarting to program {softwarePartNumber} ECL-{ECL}...", rt);
+            DisableUI();
+            Logger.Log($"\nStarting to program {softwareFile} - {softwarePartNumber} ECL-{ECL}...", rt);
             
-            disableUI();
-            doProgram(softwareFile, processor, voltage);
-            enableUI();
+            string[] args = new string[3];
+            args[0] = softwareFile;
+            args[1] = processor;
+            args[2] = voltage;
+            bw.RunWorkerAsync(args);
         }
 
-        private int doProgram(string file, string processor, double voltage)
+        private int DoProgram(string file, string processor, string voltage)
         {
             if (file == "")
             {
@@ -219,72 +239,102 @@ namespace MicrochipProgrammer
                 return -1;
             }
 
-            ProcessStartInfo startInfo = new ProcessStartInfo();
-            startInfo.CreateNoWindow = false;
-            startInfo.UseShellExecute = false;
-            startInfo.FileName = $@"{PICKIT_PATH}\PK3CMD.exe";
-            startInfo.WindowStyle = ProcessWindowStyle.Normal;
-            startInfo.Arguments = $"/{processor} /M /L /F\"{file}\"";
-
-            if (voltage > 0)
+            ProcessStartInfo startInfo = new ProcessStartInfo
             {
-                startInfo.Arguments += $@" /V{voltage.ToString()}";
+                RedirectStandardOutput = true,
+                CreateNoWindow = true,
+                UseShellExecute = false,                
+                FileName = $@"{PICKIT_PATH}\PK3CMD.exe",
+                WindowStyle = ProcessWindowStyle.Normal,
+                Arguments = $"/{processor} /M /L /F\"{file}\""                
+            };
+
+            if (voltage != "")
+            {
+                startInfo.Arguments += $@" /V{voltage}";
             }
 
             try
             {
                 // Start the process with the info we specified.
                 // Call WaitForExit and then the using statement will close.
-                using (Process exeProcess = Process.Start(startInfo))
+                using (Process p = Process.Start(startInfo))
                 {
-                    exeProcess.WaitForExit();
-                    switch (exeProcess.ExitCode)
+                    var reader = p.StandardOutput;
+                    while (!reader.EndOfStream)
+                    {
+                        var nextLine = reader.ReadLine();                        
+                        ExecuteSecure(() => Logger.Log(nextLine, rt));
+                        if (nextLine.Contains("locate JRE"))
+                        {
+                            ExecuteSecure(() => Logger.Log("Failure: MPLab software is not installed -- Contact Test Engineering.\n", rt, System.Drawing.Color.Red));
+                            pictureBox1.Image = MicrochipProgrammer.Properties.Resources.red_x;
+                            p.Kill();
+                            return -1;
+                        }
+                    }
+                    p.WaitForExit();
+                    switch (p.ExitCode)
                     {
                         case 0:
-                        Logger.Log("Device programmed successfully!", rt, System.Drawing.Color.Green);
+                            ExecuteSecure(() => Logger.Log("Device programmed successfully!", rt, System.Drawing.Color.Green));
                         pictureBox1.Image = MicrochipProgrammer.Properties.Resources.check;
                         break;
                         case 1:
-                        Logger.Log("Failure: HEX File not found (or invalid).", rt, System.Drawing.Color.Red);
+                            ExecuteSecure(() => Logger.Log("Failure: HEX File not found (or invalid).", rt, System.Drawing.Color.Red));
                         pictureBox1.Image = MicrochipProgrammer.Properties.Resources.red_x;
                         break;
                         case 2:
-                        Logger.Log("Failure: Communication with PICKIT3 lost.", rt, System.Drawing.Color.Red);
+                            ExecuteSecure(() => Logger.Log("Failure: Communication with PICKIT3 lost.", rt, System.Drawing.Color.Red));
                         pictureBox1.Image = MicrochipProgrammer.Properties.Resources.red_x;
                         break;
                         case 5:
-                        Logger.Log("Failure: PICKIT3 not detected or incorrect device connected.", rt, System.Drawing.Color.Red);
+                            ExecuteSecure(() => Logger.Log("Failure: PICKIT3 not detected or incorrect device connected.", rt, System.Drawing.Color.Red));
                         pictureBox1.Image = MicrochipProgrammer.Properties.Resources.red_x;
                         break;
                         case 7:
-                        Logger.Log("Failure: Device is not powered; select 'Power target using programmer' or supply external power source.", rt, System.Drawing.Color.Red);
+                            ExecuteSecure(() => Logger.Log("Failure: Device is not powered; select 'Power target using programmer' or supply external power source.", rt, System.Drawing.Color.Red));
                         pictureBox1.Image = MicrochipProgrammer.Properties.Resources.red_x;
                         break;
                         case 9:
-                        Logger.Log("Failure: PICKIT3 not detected or incorrect device connected.", rt, System.Drawing.Color.Red);
+                            ExecuteSecure(() => Logger.Log("Failure: PICKIT3 not detected or incorrect device connected.", rt, System.Drawing.Color.Red));
                         pictureBox1.Image = MicrochipProgrammer.Properties.Resources.red_x;
                         break;
                         case 36:
-                        Logger.Log("Failure: HEX File not found (or invalid).", rt, System.Drawing.Color.Red);
+                            ExecuteSecure(() => Logger.Log("Failure: HEX File not found (or invalid).", rt, System.Drawing.Color.Red));
                         pictureBox1.Image = MicrochipProgrammer.Properties.Resources.red_x;
                         break;
                         default:
-                        Logger.Log("Unknown failure. Exited with code " + exeProcess.ExitCode, rt, System.Drawing.Color.Red);
+                            ExecuteSecure(() => Logger.Log("Unknown failure. Exited with code " + p.ExitCode, rt, System.Drawing.Color.Red));
                         pictureBox1.Image = MicrochipProgrammer.Properties.Resources.red_x;
                         break;
                     }
-                    return exeProcess.ExitCode;
+                    return p.ExitCode;
                 }
             }
             catch (Exception ex)
             {
-                Logger.Log("Failed to program device. Error: " + ex.Message, rt, System.Drawing.Color.Red);
+                ExecuteSecure(() => Logger.Log("Failure: " + ex.Message, rt, System.Drawing.Color.Red));
                 pictureBox1.Image = MicrochipProgrammer.Properties.Resources.red_x;
                 return -1;
             }
         }
 
-        private void disableUI()
+        private void bw_DoWork(object sender, DoWorkEventArgs e)
+        {
+            string[] args = (string[])e.Argument;
+            string softwareFile = args[0];
+            string processor = args[1];
+            string voltage = args[2];
+            DoProgram(softwareFile, processor, voltage);
+        }
+
+        private void bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            EnableUI();
+        }
+
+        private void DisableUI()
         {
             txtSWPartOne.Enabled = false;
             txtSWPartTwo.Enabled = false;
@@ -295,7 +345,7 @@ namespace MicrochipProgrammer
             chkPowerTargetFromDevice.Enabled = false;
         }
 
-        private void enableUI()
+        private void EnableUI()
         {
             txtSWPartOne.Enabled = true;
             txtSWPartTwo.Enabled = true;
@@ -306,7 +356,7 @@ namespace MicrochipProgrammer
             chkPowerTargetFromDevice.Enabled = true;
         }
 
-        private IEnumerable<string> getSoftwareDirectories(string softwarePartNumber)
+        private IEnumerable<string> GetSoftwareDirectories(string softwarePartNumber)
         {
             var softwarePartOne = softwarePartNumber.Substring(4, 5);
 
@@ -342,8 +392,9 @@ namespace MicrochipProgrammer
                 tempECLStr = eclDir.Substring(eclDir.Length - 6);
                 dashIndex = tempECLStr.IndexOf("-", StringComparison.CurrentCulture);
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Logger.Log(e.Message, rt, System.Drawing.Color.Red);
                 return string.Empty;
             }
 

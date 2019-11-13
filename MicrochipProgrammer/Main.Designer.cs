@@ -42,6 +42,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.rbPIC12F1840 = new System.Windows.Forms.RadioButton();
             this.rbPIC16F716 = new System.Windows.Forms.RadioButton();
             this.rbPIC32MX440F128H = new System.Windows.Forms.RadioButton();
             this.rbPIC16F1718 = new System.Windows.Forms.RadioButton();
@@ -49,7 +50,6 @@
             this.rt = new System.Windows.Forms.RichTextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.rbPIC12F1840 = new System.Windows.Forms.RadioButton();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -130,7 +130,7 @@
             // cmdProgram
             // 
             this.cmdProgram.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.cmdProgram.Location = new System.Drawing.Point(463, 294);
+            this.cmdProgram.Location = new System.Drawing.Point(518, 332);
             this.cmdProgram.Name = "cmdProgram";
             this.cmdProgram.Size = new System.Drawing.Size(127, 48);
             this.cmdProgram.TabIndex = 8;
@@ -141,7 +141,7 @@
             // chkPowerTargetFromDevice
             // 
             this.chkPowerTargetFromDevice.AutoSize = true;
-            this.chkPowerTargetFromDevice.Location = new System.Drawing.Point(445, 176);
+            this.chkPowerTargetFromDevice.Location = new System.Drawing.Point(496, 187);
             this.chkPowerTargetFromDevice.Name = "chkPowerTargetFromDevice";
             this.chkPowerTargetFromDevice.Size = new System.Drawing.Size(172, 17);
             this.chkPowerTargetFromDevice.TabIndex = 7;
@@ -171,7 +171,7 @@
             this.label1.ForeColor = System.Drawing.Color.Red;
             this.label1.Location = new System.Drawing.Point(105, 5);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(108, 37);
+            this.label1.Size = new System.Drawing.Size(105, 37);
             this.label1.TabIndex = 7;
             this.label1.Text = "(FAST.)";
             // 
@@ -191,12 +191,23 @@
             this.groupBox2.Controls.Add(this.rbPIC16F716);
             this.groupBox2.Controls.Add(this.rbPIC32MX440F128H);
             this.groupBox2.Controls.Add(this.rbPIC16F1718);
-            this.groupBox2.Location = new System.Drawing.Point(432, 54);
+            this.groupBox2.Location = new System.Drawing.Point(486, 54);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(186, 116);
             this.groupBox2.TabIndex = 11;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Processor (mouse over for details)";
+            // 
+            // rbPIC12F1840
+            // 
+            this.rbPIC12F1840.AutoSize = true;
+            this.rbPIC12F1840.Location = new System.Drawing.Point(17, 92);
+            this.rbPIC12F1840.Name = "rbPIC12F1840";
+            this.rbPIC12F1840.Size = new System.Drawing.Size(84, 17);
+            this.rbPIC12F1840.TabIndex = 3;
+            this.rbPIC12F1840.TabStop = true;
+            this.rbPIC12F1840.Text = "PIC12F1840";
+            this.rbPIC12F1840.UseVisualStyleBackColor = true;
             // 
             // rbPIC16F716
             // 
@@ -239,7 +250,7 @@
             this.groupBox3.Controls.Add(this.rt);
             this.groupBox3.Location = new System.Drawing.Point(12, 117);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(414, 225);
+            this.groupBox3.Size = new System.Drawing.Size(468, 271);
             this.groupBox3.TabIndex = 12;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Status";
@@ -247,10 +258,10 @@
             // rt
             // 
             this.rt.Font = new System.Drawing.Font("Lucida Console", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.rt.Location = new System.Drawing.Point(10, 19);
+            this.rt.Location = new System.Drawing.Point(10, 17);
             this.rt.Name = "rt";
             this.rt.ReadOnly = true;
-            this.rt.Size = new System.Drawing.Size(391, 190);
+            this.rt.Size = new System.Drawing.Size(449, 246);
             this.rt.TabIndex = 13;
             this.rt.TabStop = false;
             this.rt.Text = "";
@@ -262,7 +273,7 @@
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(80, 13);
             this.label3.TabIndex = 13;
-            this.label3.Text = "v1.4, 10/16/18";
+            this.label3.Text = "v1.5, 11/13/19";
             // 
             // pictureBox1
             // 
@@ -270,30 +281,19 @@
             this.pictureBox1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.pictureBox1.Image = global::MicrochipProgrammer.Properties.Resources.questionmark;
             this.pictureBox1.InitialImage = global::MicrochipProgrammer.Properties.Resources.questionmark;
-            this.pictureBox1.Location = new System.Drawing.Point(479, 199);
+            this.pictureBox1.Location = new System.Drawing.Point(532, 221);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(100, 89);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox1.TabIndex = 14;
             this.pictureBox1.TabStop = false;
             // 
-            // rbPIC12F1840
-            // 
-            this.rbPIC12F1840.AutoSize = true;
-            this.rbPIC12F1840.Location = new System.Drawing.Point(17, 92);
-            this.rbPIC12F1840.Name = "rbPIC12F1840";
-            this.rbPIC12F1840.Size = new System.Drawing.Size(84, 17);
-            this.rbPIC12F1840.TabIndex = 3;
-            this.rbPIC12F1840.TabStop = true;
-            this.rbPIC12F1840.Text = "PIC12F1840";
-            this.rbPIC12F1840.UseVisualStyleBackColor = true;
-            // 
             // Main
             // 
             this.AcceptButton = this.cmdProgram;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(629, 354);
+            this.ClientSize = new System.Drawing.Size(684, 400);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.groupBox3);
